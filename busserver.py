@@ -18,6 +18,12 @@ import urllib.request
 import cloudinary
 import re
 
+try:
+    import config
+except ImportError:
+    print("Please copy template-config.py to config.py and configure appropriately !");
+    exit();
+
 # This is needed to display the images.
 
 
@@ -68,6 +74,47 @@ def load_image_into_numpy_array(image):
   return np.array(image.getdata()).reshape(
       (im_height, im_width, 3)).astype(np.uint8)
 
+def send_to_hcp(http, url, headers, qltty):
+    timestamp = int(time.time())
+    timestamp = ', "timestamp":' + str(timestamp)
+    quantity = '", "messages":[{"people":' + qltty
+    body = '{"mode":"async", "messageType":"' + str(
+        config.message_type_id_From_device) + quantity + timestamp + '}]}'
+    #print('msg ID, ', config.message_type_id_From_device)
+    print(body)
+    r = http.urlopen('POST', url, body=body, headers=headers)
+    #print('POST', url, body, headers)
+    if (debug_communication == 1):
+        print("send_to_hcp():" + str(r.status))
+    print(r.data)
+
+
+def sendinfo(long):
+    try:
+        urllib3.disable_warnings()
+    except:
+        print(
+            "urllib3.disable_warnings() failed - get a recent enough urllib3 version to avoid po$
+
+    # use with or without proxy
+    if (config.proxy_url == ''):
+        http = urllib3.PoolManager()
+    else:
+        http = urllib3.proxy_from_url(config.proxy_url)
+
+    url = 'https://iotmms' + config.hcp_account_id + config.hcp_landscape_host + '/com.sap.iotse$
+        config.device_id)
+    # print("Host   " + config.hcp_account_id + config.hcp_landscape_host)
+
+    headers = urllib3.util.make_headers(user_agent=None)
+
+    # use with authentication
+    headers['Authorization'] = 'Bearer ' + config.oauth_credentials_for_device
+    headers['Content-Type'] = 'application/json;charset=utf-8'
+
+    send_to_hcp(http, url, headers, str(long))
+
+
 # For the sake of simplicity we will use only 2 images:
 # image1.jpg
 # image2.jpg
@@ -91,18 +138,17 @@ with detection_graph.as_default():
             # print(type(image_np))
             # print(image_np)
             # URL = 'http://res.cloudinary.com/projecteve/image/upload/v1507252167/boiiiii.png'
-
-            result = str(cloudinary.api.resources(cloud_name="projecteve", api_key=156733677359362,
+            result = str(cloudinary.api.resources(cloud_name="projecteve", api_key=1567336773593$
                                                   api_secret="gUf5tbocYS8dZvA94bps3f_ALNE"))
             try:
-                result = re.compile("'version': (.*?),", re.DOTALL | re.IGNORECASE).findall(result)[0]
+                result = re.compile("'version': (.*?),", re.DOTALL | re.IGNORECASE).findall(resu$
             except:
                 pass
             if lastversion == result:
                 print("Same As Before")
                 time.sleep(10)
             else:
-                URL = "http://res.cloudinary.com/projecteve/image/upload/v" + result + "/boiiiii.png"
+                URL = "http://res.cloudinary.com/projecteve/image/upload/v" + result + "/boiiiii$
                 lastversion = result
                 with urllib.request.urlopen(URL) as url:
                     with open('temp.jpg', 'wb') as f:
@@ -110,11 +156,12 @@ with detection_graph.as_default():
                 image_np = load_image_into_numpy_array(Image.open('temp.jpg'))
                 print(type(image_np))
                 # print(image_np)
-                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+                # Expand dimensions since the model expects images to have shape: [1, None, None$
                 image_np_expanded = np.expand_dims(image_np, axis=0)
                 image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
                 # Each box represents a part of the image where a particular object was detected.
                 boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+
                 # Each score represent how level of confidence for each of the objects.
                 # Score is shown on the result image, together with the class label.
                 scores = detection_graph.get_tensor_by_name('detection_scores:0')
@@ -125,7 +172,7 @@ with detection_graph.as_default():
                     [boxes, scores, classes, num_detections],
                     feed_dict={image_tensor: image_np_expanded})
                 # Visualization of the results of a detection.
-                vis_util.visualize_boxes_and_labels_on_image_array(
+                pepes = vis_util.visualize_boxes_and_labels_on_image_array(
                     image_np,
                     np.squeeze(boxes),
                     np.squeeze(classes).astype(np.int32),
@@ -138,5 +185,7 @@ with detection_graph.as_default():
                 #  cv2.destroyAllWindows()
                 #  break
                 # time.sleep(20)
+                sendinfo(pepes)
                 print(start_time, time.time(), (start_time + time.time()))
+                print(pepes)
                 # time.sleep(abs(3 -start_time+time.time()))
