@@ -320,6 +320,7 @@ def draw_mask_on_image_array(image, mask, color='red', alpha=0.7):
   np.copyto(image, np.array(pil_image.convert('RGB')))
 
 
+
 def visualize_boxes_and_labels_on_image_array(image,
                                               boxes,
                                               classes,
@@ -335,6 +336,7 @@ def visualize_boxes_and_labels_on_image_array(image,
   """Overlay labeled boxes on an image with formatted scores and label names.
 
   This function groups boxes that correspond to the same location
+
   and creates a display string for each detection and overlays these
   on the image.  Note that this function modifies the image array in-place
   and does not return anything.
@@ -360,6 +362,7 @@ def visualize_boxes_and_labels_on_image_array(image,
     agnostic_mode: boolean (default: False) controlling whether to evaluate in
       class-agnostic mode or not.  This mode will display scores but ignore
       classes.
+
     line_thickness: integer (default: 4) controlling line width of the boxes.
   """
   # Create a display string (and color) for every box location, group any boxes
@@ -383,6 +386,7 @@ def visualize_boxes_and_labels_on_image_array(image,
       else:
         if not agnostic_mode:
           if classes[i] in category_index.keys():
+
             class_name = category_index[classes[i]]['name']
             pepes += 1
           else:
@@ -426,3 +430,5 @@ def visualize_boxes_and_labels_on_image_array(image,
           color=color,
           radius=line_thickness / 2,
           use_normalized_coordinates=use_normalized_coordinates)
+    return pepes
+#----------------
