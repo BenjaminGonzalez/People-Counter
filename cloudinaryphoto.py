@@ -1,15 +1,15 @@
 import cloudinary.uploader
 #import cloudinary
-import re
-from PIL import Image
-from PIL import Image
-import urllib.request
+#import re
+#from PIL import Image
+#from PIL import Image
+#import urllib.request
 
 
 
 
 
-cloudinary.uploader.upload("opencv_frame_94.png", public_id="boiiiii",api_key=156733677359362, api_secret="gUf5tbocYS8dZvA94bps3f_ALNE", cloud_name="projecteve", version="v1507590682")#, use_filename=True, unique_filename=False)
+cloudinary.uploader.upload("temp.jpg", public_id="boiiiii",api_key=156733677359362, api_secret="gUf5tbocYS8dZvA94bps3f_ALNE", cloud_name="projecteve", version="v1507590682")#, use_filename=True, unique_filename=False)
 
 """
 result = str(cloudinary.api.resources(cloud_name="projecteve", api_key=156733677359362, api_secret="gUf5tbocYS8dZvA94bps3f_ALNE"))

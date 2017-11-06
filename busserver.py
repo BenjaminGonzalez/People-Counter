@@ -1,5 +1,8 @@
 import numpy as np
 import os
+
+import numpy as np
+import os
 import six.moves.urllib as urllib
 import sys
 import tarfile
@@ -18,11 +21,15 @@ import urllib.request
 import cloudinary
 import re
 
+import urllib3
+import time
+
 try:
     import config
 except ImportError:
     print("Please copy template-config.py to config.py and configure appropriately !");
     exit();
+
 
 # This is needed to display the images.
 
@@ -74,6 +81,8 @@ def load_image_into_numpy_array(image):
   return np.array(image.getdata()).reshape(
       (im_height, im_width, 3)).astype(np.uint8)
 
+debug_communication = 0
+
 def send_to_hcp(http, url, headers, qltty):
     timestamp = int(time.time())
     timestamp = ', "timestamp":' + str(timestamp)
@@ -94,7 +103,7 @@ def sendinfo(long):
         urllib3.disable_warnings()
     except:
         print(
-            "urllib3.disable_warnings() failed - get a recent enough urllib3 version to avoid po$
+            "urllib3.disable_warnings() failed - get a recent enough urllib3 version to avoid potential InsecureRequestWarning warnings! Can and will continue though.")
 
     # use with or without proxy
     if (config.proxy_url == ''):
@@ -102,7 +111,7 @@ def sendinfo(long):
     else:
         http = urllib3.proxy_from_url(config.proxy_url)
 
-    url = 'https://iotmms' + config.hcp_account_id + config.hcp_landscape_host + '/com.sap.iotse$
+    url = 'https://iotmms' + config.hcp_account_id + config.hcp_landscape_host + '/com.sap.iotservices.mms/v1/api/http/data/' + str(
         config.device_id)
     # print("Host   " + config.hcp_account_id + config.hcp_landscape_host)
 
@@ -138,17 +147,18 @@ with detection_graph.as_default():
             # print(type(image_np))
             # print(image_np)
             # URL = 'http://res.cloudinary.com/projecteve/image/upload/v1507252167/boiiiii.png'
-            result = str(cloudinary.api.resources(cloud_name="projecteve", api_key=1567336773593$
+
+            result = str(cloudinary.api.resources(cloud_name="projecteve", api_key=156733677359362,
                                                   api_secret="gUf5tbocYS8dZvA94bps3f_ALNE"))
             try:
-                result = re.compile("'version': (.*?),", re.DOTALL | re.IGNORECASE).findall(resu$
+                result = re.compile("'version': (.*?),", re.DOTALL | re.IGNORECASE).findall(result)[1]
             except:
                 pass
             if lastversion == result:
                 print("Same As Before")
                 time.sleep(10)
             else:
-                URL = "http://res.cloudinary.com/projecteve/image/upload/v" + result + "/boiiiii$
+                URL = "http://res.cloudinary.com/projecteve/image/upload/v" + result + "/boiiiii.png"
                 lastversion = result
                 with urllib.request.urlopen(URL) as url:
                     with open('temp.jpg', 'wb') as f:
@@ -156,12 +166,11 @@ with detection_graph.as_default():
                 image_np = load_image_into_numpy_array(Image.open('temp.jpg'))
                 print(type(image_np))
                 # print(image_np)
-                # Expand dimensions since the model expects images to have shape: [1, None, None$
+                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
                 image_np_expanded = np.expand_dims(image_np, axis=0)
                 image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
                 # Each box represents a part of the image where a particular object was detected.
                 boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-
                 # Each score represent how level of confidence for each of the objects.
                 # Score is shown on the result image, together with the class label.
                 scores = detection_graph.get_tensor_by_name('detection_scores:0')
@@ -189,3 +198,4 @@ with detection_graph.as_default():
                 print(start_time, time.time(), (start_time + time.time()))
                 print(pepes)
                 # time.sleep(abs(3 -start_time+time.time()))
+
